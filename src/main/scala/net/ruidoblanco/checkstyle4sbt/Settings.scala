@@ -49,7 +49,7 @@ private[checkstyle4sbt] trait Settings extends Plugin {
   val checkstyleSettings = Seq(
     ivyConfigurations += checkstyleConfig,
     libraryDependencies ++= Seq(
-      "com.puppycrawl.tools" % "checkstyle" % "5.5" % "checkstyle->default"
+      "com.puppycrawl.tools" % "checkstyle" % "6.1.1" % "checkstyle->default"
     ),
 
     checkstyle <<= (checkstyleCommandLine, streams) map checkstyleTask,
