@@ -29,7 +29,7 @@ seq(checkstyleSettings : _*)
 You also have to add the plugin dependency to your project `project/plugins.sbt` or the global `.sbt/plugins/build.sbt`:
 
 ```scala
-addSbtPlugin("net.ruidoblanco" % "checkstyle4sbt" % "1.1.7")
+addSbtPlugin("net.ruidoblanco" % "checkstyle4sbt" % "0.0.2")
 ```
 
 ### Settings
