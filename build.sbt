@@ -4,7 +4,7 @@ name := "checkstyle4sbt"
 
 organization := "net.ruidoblanco"
 
-version := "0.0.2"
+version := "1.1.7"
 
 scalaVersion := "2.10.3"
 
