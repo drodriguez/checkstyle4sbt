@@ -8,7 +8,7 @@ import ReportFormat._
 
 import java.io.File
 
-private[checkstyle4sbt] case class PathSettings(targetPath: File, reportName: String, configurationFile: File, propertiesFile: Option[File], sourcePath: File)
+private[checkstyle4sbt] case class PathSettings(targetPath: File, reportName: String, configurationFile: File, propertiesFile: Option[File], sourcePaths: Seq[File])
 
 private[checkstyle4sbt] case class MiscSettings(reportFormat: ReportFormat)
 
@@ -34,28 +34,31 @@ private[checkstyle4sbt] trait Settings extends Plugin {
   /** Name of the properties file to use. Defaults to None */
   val checkstylePropertiesFile = SettingKey[Option[File]]("checkstyle-properties-file")
 
-  /** The path to the source to be analyzed. Defaults to <code>javaSource</code>. */
-  val checkstyleSourcePath = TaskKey[File]("checkstyle-source-path")
+  /** The path to the source to be analyzed. Defaults to <code>Seq(javaSource)</code>. */
+  val checkstyleSourcePaths = TaskKey[Seq[File]]("checkstyle-source-paths")
 
   /** Type of report to create. Defaults to <code>ReportFormat.Xml</code>. */
   val checkstyleReportFormat = SettingKey[ReportFormat]("checkstyle-report-format")
 
+  /** Version of CheckStyle to use. */
+  val checkstyleVersion = SettingKey[String]("checkstyle-version")
+
   protected def checkstyleTask(commandLine: List[String], streams: TaskStreams): Unit
 
-  protected def checkstyleCommandLineTask(checkstyleClasspath: Classpath, paths: PathSettings, misc: MiscSettings, streams: TaskStreams): List[String]
+  protected def checkstyleCommandLineTask(checkstyleVersion: String, checkstyleClasspath: Classpath, paths: PathSettings, misc: MiscSettings, streams: TaskStreams): List[String]
   
   private val checkstyleConfig = config("checkstyle") hide
   
   val checkstyleSettings = Seq(
     ivyConfigurations += checkstyleConfig,
     libraryDependencies ++= Seq(
-      "com.puppycrawl.tools" % "checkstyle" % "6.1.1" % "checkstyle->default"
+      "com.puppycrawl.tools" % "checkstyle" % checkstyleVersion.value % "checkstyle->default"
     ),
 
     checkstyle <<= (checkstyleCommandLine, streams) map checkstyleTask,
 
-    checkstyleCommandLine <<= (managedClasspath in checkstyleCommandLine, checkstylePathSettings, checkstyleMiscSettings, streams) map checkstyleCommandLineTask,
-    checkstylePathSettings <<= (checkstyleTargetPath, checkstyleReportName, checkstyleConfigurationFile, checkstylePropertiesFile, checkstyleSourcePath) map PathSettings dependsOn (compile in Compile),
+    checkstyleCommandLine <<= (checkstyleVersion, managedClasspath in checkstyleCommandLine, checkstylePathSettings, checkstyleMiscSettings, streams) map checkstyleCommandLineTask,
+    checkstylePathSettings <<= (checkstyleTargetPath, checkstyleReportName, checkstyleConfigurationFile, checkstylePropertiesFile, checkstyleSourcePaths) map PathSettings dependsOn (compile in Compile),
     checkstyleMiscSettings <<= (checkstyleReportFormat) map MiscSettings,
 
     managedClasspath in checkstyleCommandLine <<= (classpathTypes, update) map { 
@@ -67,6 +70,7 @@ private[checkstyle4sbt] trait Settings extends Plugin {
     checkstyleReportFormat := ReportFormat.Xml,
     checkstyleConfigurationFile <<= baseDirectory(_ / "project" / "checkstyle-config.xml"),
     checkstylePropertiesFile := None,
-    checkstyleSourcePath <<= javaSource in Compile map { (js) => js }
+    checkstyleSourcePaths <<= javaSource in Compile map { (jc) => Seq(jc) },
+    checkstyleVersion := "6.1.1"
   )
 }

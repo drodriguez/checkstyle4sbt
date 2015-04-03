@@ -5,11 +5,10 @@ import sbt.Keys._
 
 import java.io.File
 
-import ReportFormat._
-
 private[checkstyle4sbt] trait CommandLine extends Plugin with Settings {
 
   override def checkstyleCommandLineTask(
+    checkstyleVersion: String,
     checkstyleClasspath: Classpath,
     paths: PathSettings,
     misc: MiscSettings,
@@ -27,13 +26,23 @@ private[checkstyle4sbt] trait CommandLine extends Plugin with Settings {
     def checkstyleCallOptions = {
       val reportFile = paths.targetPath / paths.reportName
 
+      val recursiveOption = {
+        def before6_3(major: Int, minor: Int) =
+          major.toInt < 6 || (major.toInt == 6 && minor.toInt < 3)
+
+        val versionPattern = """^(\d+)\.(\d+).*""".r
+        checkstyleVersion match {
+          case versionPattern(major, minor) if before6_3(major.toInt, minor.toInt) => Some("-r")
+          case _ => None
+        }
+      }
+
       addPropertiesFileParameter(
         List(
           "-c", paths.configurationFile.toString,
           misc.reportFormat.toString,
-          "-o", reportFile.toString,
-          "-r",  paths.sourcePath.toString
-        )
+          "-o", reportFile.toString
+        ) ++ recursiveOption ++ paths.sourcePaths.map(_.absolutePath)
       )
     }
 
@@ -46,7 +55,7 @@ private[checkstyle4sbt] trait CommandLine extends Plugin with Settings {
 
     streams.log.debug("checkstyleCommandLine task executed")
     streams.log.debug(paths.targetPath.toString)
-    streams.log.debug(paths.sourcePath.toString)
+    streams.log.debug(paths.sourcePaths.mkString(", "))
     IO.createDirectory(paths.targetPath)
 
     checkstyleCommandLine
