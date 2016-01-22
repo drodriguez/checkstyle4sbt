@@ -43,9 +43,12 @@ private[checkstyle4sbt] trait Settings extends Plugin {
   /** Version of CheckStyle to use. */
   val checkstyleVersion = SettingKey[String]("checkstyle-version")
 
+  /** Path to the <code>java</code> executable with which to run CheckStyle. */
+  val javaExecutable = SettingKey[String]("java-executable")
+
   protected def checkstyleTask(commandLine: List[String], streams: TaskStreams): Unit
 
-  protected def checkstyleCommandLineTask(checkstyleVersion: String, checkstyleClasspath: Classpath, paths: PathSettings, misc: MiscSettings, streams: TaskStreams): List[String]
+  protected def checkstyleCommandLineTask(javaExecutable: String, checkstyleVersion: String, checkstyleClasspath: Classpath, paths: PathSettings, misc: MiscSettings, streams: TaskStreams): List[String]
   
   private val checkstyleConfig = config("checkstyle") hide
   
@@ -57,7 +60,7 @@ private[checkstyle4sbt] trait Settings extends Plugin {
 
     checkstyle <<= (checkstyleCommandLine, streams) map checkstyleTask,
 
-    checkstyleCommandLine <<= (checkstyleVersion, managedClasspath in checkstyleCommandLine, checkstylePathSettings, checkstyleMiscSettings, streams) map checkstyleCommandLineTask,
+    checkstyleCommandLine <<= (javaExecutable, checkstyleVersion, managedClasspath in checkstyleCommandLine, checkstylePathSettings, checkstyleMiscSettings, streams) map checkstyleCommandLineTask,
     checkstylePathSettings <<= (checkstyleTargetPath, checkstyleReportName, checkstyleConfigurationFile, checkstylePropertiesFile, checkstyleSourcePaths) map PathSettings dependsOn (compile in Compile),
     checkstyleMiscSettings <<= (checkstyleReportFormat) map MiscSettings,
 
@@ -71,6 +74,7 @@ private[checkstyle4sbt] trait Settings extends Plugin {
     checkstyleConfigurationFile <<= baseDirectory(_ / "project" / "checkstyle-config.xml"),
     checkstylePropertiesFile := None,
     checkstyleSourcePaths <<= javaSource in Compile map { (jc) => Seq(jc) },
-    checkstyleVersion := "6.1.1"
+    checkstyleVersion := "6.1.1",
+    javaExecutable := "java"
   )
 }

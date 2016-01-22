@@ -8,6 +8,7 @@ import java.io.File
 private[checkstyle4sbt] trait CommandLine extends Plugin with Settings {
 
   override def checkstyleCommandLineTask(
+    javaExecutable: String,
     checkstyleVersion: String,
     checkstyleClasspath: Classpath,
     paths: PathSettings,
@@ -20,7 +21,7 @@ private[checkstyle4sbt] trait CommandLine extends Plugin with Settings {
       val classpath = commandLineClasspath(checkstyleClasspath.files)
       streams.log.debug("CheckStyle classpath: %s" format classpath)
 
-      List("java", "-cp", classpath, "com.puppycrawl.tools.checkstyle.Main")
+      List(javaExecutable, "-cp", classpath, "com.puppycrawl.tools.checkstyle.Main")
     }
 
     def checkstyleCallOptions = {

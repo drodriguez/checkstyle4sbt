@@ -62,6 +62,10 @@ addSbtPlugin("net.ruidoblanco" % "checkstyle4sbt" % "0.0.3")
     * _Description_: Paths of the CheckStyle directories containing source files to analyze.
     * _Accepts_: any sequence of `File` directories
     * _Default_: `Seq(javaSource)`
+* `javaExecutable`
+    * _Description_: Path to the `java` executable with which to run CheckStyle.
+    * _Accepts_: any string pointing to the `java` executable
+    * _Default_: `java`
 
 ## TODO
 
