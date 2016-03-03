@@ -29,11 +29,15 @@ seq(checkstyleSettings : _*)
 You also have to add the plugin dependency to your project `project/plugins.sbt` or the global `.sbt/plugins/build.sbt`:
 
 ```scala
-addSbtPlugin("net.ruidoblanco" % "checkstyle4sbt" % "0.0.2")
+addSbtPlugin("net.ruidoblanco" % "checkstyle4sbt" % "0.0.3")
 ```
 
 ### Settings
 
+* `checkstyleVersion`
+    * _Description_: Chooses the version of CheckStyle to use.
+    * _Accepts_: any CheckStyle version string
+    * _Default_: `"6.1.1"`
 * `checkstyleReportFormat`
     * _Description_: Selects the output format for the CheckStyle report.
     * _Accepts_: `ReportFormat.{Plain, Xml}`
@@ -54,10 +58,14 @@ addSbtPlugin("net.ruidoblanco" % "checkstyle4sbt" % "0.0.2")
     * _Description_: Path of the CheckStyle properties file.
     * _Accepts_: `None` and `Some[File]`
     * _Default_: `None` (no property file)
-* `checkstyleSourcePath`
-    * _Description_: Path of the CheckStyle properties file.
-    * _Accepts_: any directory `File`
-    * _Default_: `javaSource`
+* `checkstyleSourcePaths`
+    * _Description_: Paths of the CheckStyle directories containing source files to analyze.
+    * _Accepts_: any sequence of `File` directories
+    * _Default_: `Seq(javaSource)`
+* `javaExecutable`
+    * _Description_: Path to the `java` executable with which to run CheckStyle.
+    * _Accepts_: any string pointing to the `java` executable
+    * _Default_: `java`
 
 ## TODO
 
